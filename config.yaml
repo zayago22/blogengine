@@ -1,0 +1,190 @@
+# =============================================================================
+# BlogEngine - Configuración General
+# =============================================================================
+
+app:
+  name: "BlogEngine"
+  version: "1.0.0"
+  descripcion: "Plataforma de generación y distribución automática de blogs"
+
+# --- Proveedores de IA ---
+ai_providers:
+  deepseek:
+    name: "DeepSeek V3.2"
+    model_chat: "deepseek-chat"
+    model_reasoner: "deepseek-reasoner"
+    max_tokens_default: 4000
+    temperature_default: 0.7
+    pricing:
+      input_per_1m: 0.28
+      input_cached_per_1m: 0.028
+      output_per_1m: 0.42
+
+  claude:
+    name: "Claude (Anthropic)"
+    models:
+      haiku: "claude-haiku-4-5-20251001"
+      sonnet: "claude-sonnet-4-5-20250929"
+      opus: "claude-opus-4-6"
+    max_tokens_default: 4096
+    temperature_default: 0.7
+    pricing:
+      haiku:
+        input_per_1m: 1.00
+        output_per_1m: 5.00
+      sonnet:
+        input_per_1m: 3.00
+        output_per_1m: 15.00
+      opus:
+        input_per_1m: 5.00
+        output_per_1m: 25.00
+
+# --- Enrutamiento de IA por tarea y plan ---
+ai_routing:
+  generacion_articulo:
+    free: { provider: "deepseek", model: "deepseek-chat" }
+    starter: { provider: "deepseek", model: "deepseek-chat" }
+    pro: { provider: "deepseek", model: "deepseek-chat" }
+
+  revision_editorial:
+    free: null  # No disponible
+    starter: { provider: "claude", model: "haiku" }
+    pro: { provider: "claude", model: "haiku" }
+
+  pulido_premium:
+    free: null
+    starter: null
+    pro: { provider: "claude", model: "sonnet" }
+
+  copies_redes_sociales:
+    free: { provider: "deepseek", model: "deepseek-chat" }
+    starter: { provider: "deepseek", model: "deepseek-chat" }
+    pro: { provider: "deepseek", model: "deepseek-chat" }
+
+  estrategia_editorial:
+    free: null
+    starter: null
+    pro: { provider: "claude", model: "sonnet" }
+
+  analisis_seo:
+    free: null
+    starter: { provider: "claude", model: "haiku" }
+    pro: { provider: "claude", model: "sonnet" }
+
+# --- Planes ---
+planes:
+  free:
+    nombre: "Free"
+    precio_usd: 0
+    blogs_por_mes: 2
+    redes_sociales: ["facebook", "google_business"]
+    revision_editorial: false
+    reportes: false
+    carruseles_instagram: false
+
+  starter:
+    nombre: "Starter"
+    precio_usd: 49
+    blogs_por_mes: 4
+    redes_sociales: ["facebook", "instagram", "google_business", "linkedin"]
+    revision_editorial: true
+    reportes: true
+    carruseles_instagram: true
+
+  pro:
+    nombre: "Pro"
+    precio_usd: 99
+    blogs_por_mes: 8
+    redes_sociales: ["facebook", "instagram", "linkedin", "twitter", "pinterest", "google_business"]
+    revision_editorial: true
+    reportes: true
+    carruseles_instagram: true
+    calendario_editorial_ia: true
+
+  agency:
+    nombre: "Agency"
+    precio_usd: 299
+    clientes_incluidos: 10
+    hereda_de: "pro"
+    white_label: true
+    api_access: true
+
+# --- CMS Soportados ---
+cms:
+  wordpress:
+    nombre: "WordPress"
+    api_path: "/wp-json/wp/v2"
+    auth_type: "application_password"  # o jwt
+
+  webflow:
+    nombre: "Webflow"
+    api_base: "https://api.webflow.com/v2"
+    auth_type: "oauth2"
+
+  ghost:
+    nombre: "Ghost"
+    auth_type: "admin_api_key"
+
+  custom:
+    nombre: "API Personalizada"
+    auth_type: "configurable"
+
+# --- Redes Sociales ---
+redes_sociales:
+  facebook:
+    nombre: "Facebook"
+    image_size: [1200, 630]
+    max_caption_length: 63206
+    api: "Meta Graph API"
+
+  instagram:
+    nombre: "Instagram"
+    image_size: [1080, 1080]
+    carousel_size: [1080, 1080]
+    story_size: [1080, 1920]
+    max_caption_length: 2200
+    max_hashtags: 30
+    api: "Instagram Graph API"
+
+  linkedin:
+    nombre: "LinkedIn"
+    image_size: [1200, 627]
+    max_caption_length: 3000
+    api: "LinkedIn Marketing API"
+
+  twitter:
+    nombre: "X/Twitter"
+    image_size: [1200, 675]
+    max_tweet_length: 280
+    max_thread_tweets: 5
+    api: "Twitter API v2"
+
+  pinterest:
+    nombre: "Pinterest"
+    pin_size: [1000, 1500]
+    max_description_length: 500
+    api: "Pinterest API v5"
+
+  google_business:
+    nombre: "Google Business Profile"
+    image_size: [720, 540]
+    max_post_length: 1500
+    api: "Google Business Profile API"
+
+# --- Contenido ---
+contenido:
+  longitud_minima_palabras: 800
+  longitud_maxima_palabras: 1500
+  estructura_seo:
+    - titulo_h1
+    - meta_description
+    - introduccion
+    - h2_secciones_minimo: 3
+    - cta_final
+  idiomas_soportados: ["es", "en"]
+
+# --- Programación ---
+scheduler:
+  auto_publish_delay_hours: 24  # Horas antes de auto-publicar sin aprobación
+  distribucion_social_delay_minutes: 30  # Minutos entre cada red social
+  metricas_recoleccion_horas: [24, 48, 168]  # Recolectar métricas a las 24h, 48h y 7 días

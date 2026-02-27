@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from models import *; print\\(''Models OK''\\)\")",
+      "Bash(pip install \"sqlalchemy[asyncio]==2.0.36\" aiosqlite==0.20.0 \"fastapi==0.115.6\" \"uvicorn[standard]==0.34.0\" pydantic==2.10.4 pydantic-settings==2.7.1 python-dotenv==1.0.1 pyyaml==6.0.2 jinja2==3.1.5 rich==13.9.4 cryptography==44.0.0 python-multipart==0.0.19 httpx==0.28.1 tenacity==9.0.0)",
+      "Bash(python -m pip install \"sqlalchemy[asyncio]==2.0.36\" aiosqlite==0.20.0 \"fastapi==0.115.6\" \"uvicorn[standard]==0.34.0\" pydantic==2.10.4 pydantic-settings==2.7.1 python-dotenv==1.0.1 pyyaml==6.0.2 jinja2==3.1.5 rich==13.9.4 cryptography==44.0.0 python-multipart==0.0.19 httpx==0.28.1 tenacity==9.0.0)",
+      "Bash(python -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(/c/Users/miof1/AppData/Local/Programs/Python/Python313/python.exe --version)",
+      "Bash(/c/Users/miof1/AppData/Local/Programs/Python/Python313/python.exe -m venv venv)",
+      "Bash(source venv/Scripts/activate)"
+    ]
+  }
+}

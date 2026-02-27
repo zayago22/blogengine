@@ -1,0 +1,32 @@
+<table class="w-full text-sm">
+    <thead>
+        <tr class="text-left text-gray-500 bg-gray-50">
+            <th class="px-6 py-3 font-medium">ID</th>
+            <th class="px-6 py-3 font-medium">Nombre</th>
+            <th class="px-6 py-3 font-medium">Industria</th>
+            <th class="px-6 py-3 font-medium">Blog slug</th>
+            <th class="px-6 py-3 font-medium">Dominio</th>
+            <th class="px-6 py-3 font-medium">Acciones</th>
+        </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+        {% for client in clients %}
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-3 text-gray-400">{{ client.id }}</td>
+            <td class="px-6 py-3 font-medium text-gray-900">{{ client.nombre }}</td>
+            <td class="px-6 py-3 text-gray-600">{{ client.industria or "—" }}</td>
+            <td class="px-6 py-3"><code class="text-xs bg-gray-100 px-1 py-0.5 rounded">{{ client.blog_slug }}</code>
+            </td>
+            <td class="px-6 py-3 text-gray-600">{{ client.dominio or "—" }}</td>
+            <td class="px-6 py-3">
+                <a href="/admin/clients/{{ client.id }}/" class="text-indigo-600 hover:underline text-xs">Ver detalle
+                    →</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" class="px-6 py-10 text-center text-gray-400">No se encontraron clientes</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

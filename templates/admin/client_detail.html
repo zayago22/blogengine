@@ -1,0 +1,187 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ client.nombre }} · BlogEngine{% endblock %}
+{% block heading %}{{ client.nombre }}{% endblock %}
+
+{% block content %}
+<div x-data="{ tab: 'posts' }">
+
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-6 bg-white rounded-xl shadow-sm p-2 w-fit">
+        <button @click="tab='posts'"
+            :class="tab==='posts' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors">Posts ({{ posts|length }})</button>
+        <button @click="tab='keywords'"
+            :class="tab==='keywords' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors">Keywords ({{ keywords|length }})</button>
+        <button @click="tab='money'"
+            :class="tab==='money' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors">Money Pages ({{ money_pages|length
+            }})</button>
+        <button @click="tab='config'"
+            :class="tab==='config' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors">Config SEO</button>
+    </div>
+
+    <!-- Tab: Posts -->
+    <div x-show="tab==='posts'" x-cloak>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 bg-gray-50">
+                        <th class="px-6 py-3 font-medium">Título / Keyword</th>
+                        <th class="px-6 py-3 font-medium">Estado</th>
+                        <th class="px-6 py-3 font-medium">Score SEO</th>
+                        <th class="px-6 py-3 font-medium">Fecha</th>
+                        <th class="px-6 py-3 font-medium"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for post in posts %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-3">
+                            <p class="font-medium text-gray-900 truncate max-w-xs">{{ post.titulo or
+                                post.keyword_principal }}</p>
+                            <p class="text-xs text-gray-400">{{ post.keyword_principal }}</p>
+                        </td>
+                        <td class="px-6 py-3">{% include "admin/partials/post_estado_badge.html" %}</td>
+                        <td class="px-6 py-3 text-gray-400">—</td>
+                        <td class="px-6 py-3 text-gray-400 text-xs">{{ post.created_at.strftime('%d/%m/%Y') if
+                            post.created_at else "—" }}</td>
+                        <td class="px-6 py-3"><a href="/admin/posts/{{ post.id }}/"
+                                class="text-indigo-600 hover:underline text-xs">Ver →</a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-400">Sin posts aún</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Keywords -->
+    <div x-show="tab==='keywords'" x-cloak>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 bg-gray-50">
+                        <th class="px-6 py-3 font-medium">Keyword</th>
+                        <th class="px-6 py-3 font-medium">Intención</th>
+                        <th class="px-6 py-3 font-medium">Dificultad</th>
+                        <th class="px-6 py-3 font-medium">Prioridad</th>
+                        <th class="px-6 py-3 font-medium">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for kw in keywords %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-3 font-medium text-gray-900">{{ kw.keyword }}</td>
+                        <td class="px-6 py-3 text-gray-600">{{ kw.intencion or "—" }}</td>
+                        <td class="px-6 py-3">
+                            <span class="text-xs px-2 py-0.5 rounded-full
+                {% if kw.dificultad_estimada == 'alta' %}bg-red-100 text-red-700
+                {% elif kw.dificultad_estimada == 'media' %}bg-yellow-100 text-yellow-700
+                {% else %}bg-green-100 text-green-700{% endif %}">
+                                {{ kw.dificultad_estimada or "—" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-3 text-gray-600">{{ kw.prioridad or "—" }}</td>
+                        <td class="px-6 py-3">
+                            <span class="text-xs px-2 py-0.5 rounded-full
+                {% if kw.estado == 'publicado' %}bg-green-100 text-green-700
+                {% elif kw.estado == 'en_proceso' %}bg-blue-100 text-blue-700
+                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ kw.estado or "pendiente" }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-400">Sin keywords. Ejecuta /api/seo/{{
+                            client.id }}/research</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Money Pages -->
+    <div x-show="tab==='money'" x-cloak>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 bg-gray-50">
+                        <th class="px-6 py-3 font-medium">URL</th>
+                        <th class="px-6 py-3 font-medium">Descripción</th>
+                        <th class="px-6 py-3 font-medium">Prioridad</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for mp in money_pages %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-3"><a href="{{ mp.url }}" target="_blank"
+                                class="text-indigo-600 hover:underline">{{ mp.url }}</a></td>
+                        <td class="px-6 py-3 text-gray-600">{{ mp.descripcion or "—" }}</td>
+                        <td class="px-6 py-3 text-gray-600">{{ mp.prioridad }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="px-6 py-10 text-center text-gray-400">Sin money pages</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Config SEO -->
+    <div x-show="tab==='config'" x-cloak>
+        <div class="bg-white rounded-xl shadow-sm p-6 max-w-2xl">
+            <dl class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <dt class="text-gray-500">Industria</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.industria or "—" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Dominio</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.dominio or "—" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Blog slug</dt>
+                    <dd class="font-medium text-gray-900 mt-1"><code
+                            class="bg-gray-100 px-1 rounded">{{ client.blog_slug }}</code></dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Idioma</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.idioma or "es" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Keyword principal</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.keyword_principal or "—" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Tono de voz</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.tono_voz or "—" }}</dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-gray-500">Descripción del negocio</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.descripcion_negocio or "—" }}</dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-gray-500">Audiencia objetivo</dt>
+                    <dd class="font-medium text-gray-900 mt-1">{{ client.audiencia_objetivo or "—" }}</dd>
+                </div>
+            </dl>
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <a href="/api/seo/{{ client.id }}/diagnostic" target="_blank"
+                    class="inline-flex items-center gap-2 text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    Ver diagnóstico SEO completo →
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

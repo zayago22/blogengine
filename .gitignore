@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Entorno
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Base de datos local
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Docker
+docker-compose.override.yml

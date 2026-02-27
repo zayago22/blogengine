@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: blogengine
+      POSTGRES_USER: ${POSTGRES_USER:-blogengine}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-blogengine}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build: .
+    ports:
+      - "${PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-blogengine}:${POSTGRES_PASSWORD}@postgres:5432/blogengine
+      REDIS_URL: redis://redis:6379/0
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2
+    restart: unless-stopped
+
+  celery-worker:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-blogengine}:${POSTGRES_PASSWORD}@postgres:5432/blogengine
+      REDIS_URL: redis://redis:6379/0
+    command: celery -A core.celery_app worker --loglevel=info --concurrency=2
+    restart: unless-stopped
+
+  celery-beat:
+    build: .
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery-worker:
+        condition: service_started
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-blogengine}:${POSTGRES_PASSWORD}@postgres:5432/blogengine
+      REDIS_URL: redis://redis:6379/0
+    command: celery -A core.celery_app beat --loglevel=info --scheduler celery.beat:PersistentScheduler --schedule=/tmp/celerybeat-schedule
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

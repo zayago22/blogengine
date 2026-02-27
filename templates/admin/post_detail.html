@@ -1,0 +1,106 @@
+{% extends "admin/base.html" %}
+{% block title %}Post #{{ post.id }} · BlogEngine{% endblock %}
+{% block heading %}Post #{{ post.id }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Columna izquierda: info + audit -->
+    <div class="space-y-6">
+        <!-- Info básica -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="font-semibold text-gray-800 mb-4">Información</h2>
+            <dl class="space-y-3 text-sm">
+                <div>
+                    <dt class="text-gray-500">Título</dt>
+                    <dd class="font-medium text-gray-900 mt-0.5">{{ post.titulo or "—" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Keyword principal</dt>
+                    <dd class="font-medium text-gray-900 mt-0.5">{{ post.keyword_principal }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Slug</dt>
+                    <dd class="mt-0.5"><code
+                            class="text-xs bg-gray-100 px-1 py-0.5 rounded">{{ post.slug or "—" }}</code></dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Cliente</dt>
+                    <dd class="mt-0.5">
+                        {% if client %}<a href="/admin/clients/{{ client.id }}/"
+                            class="text-indigo-600 hover:underline">{{ client.nombre }}</a>{% else %}#{{ post.client_id
+                        }}{% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Estado</dt>
+                    <dd class="mt-0.5" id="post-badge-{{ post.id }}">{% include "admin/partials/post_estado_badge.html"
+                        %}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Creado</dt>
+                    <dd class="mt-0.5 text-gray-600">{{ post.created_at.strftime('%d/%m/%Y %H:%M') if post.created_at
+                        else "—" }}</dd>
+                </div>
+                {% if post.fecha_publicado %}
+                <div>
+                    <dt class="text-gray-500">Publicado</dt>
+                    <dd class="mt-0.5 text-gray-600">{{ post.fecha_publicado.strftime('%d/%m/%Y %H:%M') }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+
+        <!-- Score SEO -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="font-semibold text-gray-800 mb-4">Score SEO</h2>
+            <p class="text-gray-400 text-sm text-center">Sin auditoría guardada</p>
+            <a href="/api/seo/{{ client.id }}/audit/{{ post.id }}" target="_blank"
+                class="block mt-3 text-center text-xs text-indigo-500 hover:underline">Generar auditoría →</a>
+        </div>
+
+        <!-- Acciones -->
+        <div class="bg-white rounded-xl shadow-sm p-6 space-y-3">
+            <h2 class="font-semibold text-gray-800 mb-4">Acciones</h2>
+            {% if post.estado == 'en_revision' %}
+            <button hx-post="/admin/posts/{{ post.id }}/approve" hx-target="#post-badge-{{ post.id }}"
+                hx-swap="innerHTML"
+                class="w-full bg-green-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-green-700">
+                Aprobar post
+            </button>
+            {% endif %}
+            {% if post.estado in ['aprobado', 'en_revision', 'borrador'] %}
+            <button hx-post="/admin/posts/{{ post.id }}/publish" hx-target="#post-badge-{{ post.id }}"
+                hx-swap="innerHTML"
+                class="w-full bg-indigo-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-indigo-700">
+                Publicar ahora
+            </button>
+            {% endif %}
+            {% if post.slug and client %}
+            <a href="/b/{{ post.slug }}" target="_blank"
+                class="block w-full text-center border border-indigo-200 text-indigo-600 text-sm py-2 px-4 rounded-lg hover:bg-indigo-50">
+                Ver en blog →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Columna derecha: preview HTML -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="font-semibold text-gray-800">Contenido</h2>
+            {% if post.meta_description %}
+            <p class="text-xs text-gray-500 mt-1">{{ post.meta_description }}</p>
+            {% endif %}
+        </div>
+        <div class="p-6 prose prose-sm max-w-none overflow-y-auto max-h-screen">
+            {% if post.contenido_html %}
+            {{ post.contenido_html | safe }}
+            {% else %}
+            <p class="text-gray-400">Sin contenido</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

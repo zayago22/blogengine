@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pip install \"sqlalchemy[asyncio]==2.0.36\" aiosqlite==0.20.0 \"fastapi==0.115.6\" \"uvicorn[standard]==0.34.0\" pydantic==2.10.4 pydantic-settings==2.7.1 python-dotenv==1.0.1 pyyaml==6.0.2 jinja2==3.1.5 rich==13.9.4 cryptography==44.0.0 python-multipart==0.0.19 httpx==0.28.1 tenacity==9.0.0 openai==1.58.1 anthropic==0.42.0)",
+      "Bash(python -c \"from api.main import app; print\\(''Main OK''\\)\")",
+      "Bash(curl -s http://localhost:8000/health)",
+      "Bash(curl -s http://localhost:8000/api/clients/)",
+      "Bash(curl -s -X POST http://localhost:8000/api/clients/ -H \"Content-Type: application/json\" -d '{\"\"nombre\"\":\"\"Test Cliente\"\",\"\"email\"\":\"\"test@test.com\"\",\"\"industria\"\":\"\"tech\"\",\"\"sitio_web\"\":\"\"https://test.com\"\"}')",
+      "Bash(curl -s http://localhost:8000/api/clients/1)",
+      "Bash(python -m scripts.seed_test_data)",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/docs)",
+      "Bash(curl -s -X POST http://localhost:8000/api/clients/ -H \"Content-Type: application/json\" -d '{\"\"nombre\"\":\"\"Otro Cliente\"\",\"\"email\"\":\"\"otro@test.com\"\",\"\"industria\"\":\"\"restaurantes\"\",\"\"sitio_web\"\":\"\"https://otrorestaurante.com\"\"}')",
+      "Bash(python -c \"from models import *; print\\(''OK''\\)\")"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+# Prompt para industria general
+# Usado como fallback cuando no hay prompt específico para la industria del cliente.
+
+instrucciones: |
+  Escribe contenido relevante y útil para el público objetivo del negocio.
+  Incluye ejemplos prácticos y consejos aplicables.
+  Evita jerga técnica innecesaria.
+  Mantén un balance entre información y entretenimiento.
+
+vocabulario: []
+
+ctas:
+  - "Contáctanos para más información"
+  - "Visita nuestro sitio web para conocer más"
+  - "Agenda una consulta gratuita"
+  - "Síguenos en redes sociales para más contenido"
+
+estructura_sugerida:
+  - introduccion_con_problema
+  - desarrollo_con_soluciones
+  - ejemplos_practicos
+  - conclusion_con_cta
+
+temas_sugeridos:
+  - "Tendencias del sector en [año]"
+  - "Guía completa para [tema del nicho]"
+  - "Errores comunes al [acción relacionada]"
+  - "Beneficios de [servicio/producto]"
+  - "Cómo elegir el mejor [servicio/producto]"

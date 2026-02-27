@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "ms-python.pylance",
+        "samuelcolvin.jinjahtml",
+        "redhat.vscode-yaml",
+        "humao.rest-client",
+        "ms-azuretools.vscode-docker",
+        "github.copilot"
+    ]
+}

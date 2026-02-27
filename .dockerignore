@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+.env
+.env.*
+.git
+.gitignore
+*.md
+.vscode
+node_modules
+blogengine.db
+*.sqlite
+scripts/onboarding_*

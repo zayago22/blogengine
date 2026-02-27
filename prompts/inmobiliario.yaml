@@ -1,0 +1,56 @@
+# Prompt para industria inmobiliaria
+# Optimizado para brokers, agencias inmobiliarias y bienes raíces.
+
+instrucciones: |
+  Escribe artículos enfocados en el mercado inmobiliario.
+  Incluye datos sobre tendencias del mercado, precios y zonas de interés.
+  Habla sobre procesos de compra/venta/renta de forma clara y sin jerga legal excesiva.
+  Incluye consejos prácticos para compradores, vendedores e inversionistas.
+  Menciona la importancia de trabajar con un asesor inmobiliario profesional.
+  Si es relevante, incluye información sobre créditos hipotecarios y financiamiento.
+
+vocabulario:
+  - plusvalía
+  - retorno de inversión
+  - crédito hipotecario
+  - escrituras
+  - avalúo
+  - enganche
+  - renta fija
+  - bienes raíces
+  - inversión inmobiliaria
+  - asesor inmobiliario
+  - preventas
+  - departamento
+  - casa habitación
+  - terreno
+  - desarrollo inmobiliario
+  - INFONAVIT
+  - FOVISSSTE
+  - notario público
+
+ctas:
+  - "¿Buscas invertir en bienes raíces? Contáctanos para asesoría personalizada"
+  - "Agenda una cita con nuestros asesores inmobiliarios"
+  - "Conoce nuestro catálogo de propiedades disponibles"
+  - "Solicita un análisis de mercado para tu zona de interés"
+  - "¿Quieres saber cuánto vale tu propiedad? Te hacemos un avalúo gratuito"
+
+estructura_sugerida:
+  - introduccion_con_dato_de_mercado
+  - contexto_del_mercado_actual
+  - consejos_practicos_numerados
+  - ejemplo_o_caso_real
+  - conclusion_con_cta_inmobiliario
+
+temas_sugeridos:
+  - "Guía para comprar tu primera casa en México"
+  - "¿Es buen momento para invertir en bienes raíces?"
+  - "Zonas con mayor plusvalía en [ciudad]"
+  - "Renta vs compra: ¿Qué conviene más?"
+  - "Errores comunes al comprar una propiedad"
+  - "¿Qué es la plusvalía y cómo afecta tu inversión?"
+  - "Cómo funciona un crédito hipotecario en México"
+  - "Tips para rentar tu propiedad de forma segura"
+  - "Tendencias del mercado inmobiliario en [año]"
+  - "¿Qué documentos necesitas para comprar una casa?"

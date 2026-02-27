@@ -1,0 +1,28 @@
+# =============================================
+# BlogEngine × Netlify
+# =============================================
+#
+# Para sitios estáticos hospedados en Netlify.
+# Dos opciones:
+#
+# OPCIÓN A: _redirects (proxy simple)
+# Agrega este archivo como _redirects en la raíz del sitio.
+# Netlify actúa como proxy → Google ve tu dominio ✅
+# Limitación: sirve el HTML de BlogEngine tal cual.
+#
+# OPCIÓN B: Edge Function (abajo)
+# Más control: puedes inyectar header/footer del sitio.
+# =============================================
+
+# OPCIÓN A: _redirects
+# Copiar estas líneas al archivo _redirects en la raíz:
+
+/blog              https://blogengine.app/b/MI-SLUG  200
+/blog/             https://blogengine.app/b/MI-SLUG  200
+/blog/:slug        https://blogengine.app/b/MI-SLUG/:slug  200
+/blog/sitemap.xml  https://blogengine.app/b/MI-SLUG/sitemap.xml  200
+/blog/rss.xml      https://blogengine.app/b/MI-SLUG/rss.xml  200
+
+# IMPORTANTE: Reemplazar MI-SLUG con el slug real del cliente.
+# El código 200 hace que Netlify actúe como proxy (no redirect).
+# Google ve tu dominio, no blogengine.app ✅

@@ -1,0 +1,38 @@
+# Prompt para industria de restaurantes y food trucks
+
+instrucciones: |
+  Escribe artículos enfocados en la industria gastronómica.
+  Incluye tendencias culinarias, tips de negocio y estrategias de marketing para restaurantes.
+  Habla sobre experiencia del cliente, menú, operaciones y presencia digital.
+  Incluye datos sobre la industria restaurantera cuando sea posible.
+  Menciona la importancia de la presencia en redes sociales y reseñas online.
+
+vocabulario:
+  - food truck
+  - menú
+  - servicio al cliente
+  - costos de operación
+  - ticket promedio
+  - rotación de mesas
+  - delivery
+  - comida rápida
+  - gastronomía
+  - chef
+  - cocina comercial
+  - normas sanitarias
+  - COFEPRIS
+  - permisos de operación
+
+ctas:
+  - "¿Quieres iniciar tu negocio de comida? Contáctanos"
+  - "Conoce nuestras soluciones para food trucks"
+  - "Agenda una consulta para tu proyecto gastronómico"
+  - "Visita nuestro sitio para ver modelos de food trucks disponibles"
+
+temas_sugeridos:
+  - "Cómo iniciar un negocio de food truck exitoso"
+  - "Tendencias gastronómicas para [año]"
+  - "Cómo atraer más clientes a tu restaurante con marketing digital"
+  - "Permisos que necesitas para operar un food truck en México"
+  - "Cómo diseñar un menú que venda"
+  - "Tips para manejar reseñas negativas en Google"

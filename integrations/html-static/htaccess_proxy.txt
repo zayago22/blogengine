@@ -1,0 +1,37 @@
+# =============================================
+# BlogEngine × Apache (.htaccess)
+# =============================================
+#
+# Para sitios en hosting compartido con Apache (cPanel, etc.)
+# MUY COMÚN en México: Hostgator, GoDaddy, Namecheap, etc.
+#
+# INSTALACIÓN:
+# 1. Crear carpeta /blog en el hosting del cliente
+# 2. Poner este .htaccess dentro de /blog/
+# 3. Reemplazar MI-SLUG con el slug real
+#
+# NOTA: Requiere mod_proxy habilitado.
+# Si el hosting no lo permite, usar la opción del
+# Static Site Generator (generate_static.py)
+# =============================================
+
+RewriteEngine On
+
+# Proxy: /blog → blogengine.app
+RewriteRule ^$ https://blogengine.app/b/MI-SLUG [P,L]
+RewriteRule ^(.+)$ https://blogengine.app/b/MI-SLUG/$1 [P,L]
+
+ProxyPassReverse / https://blogengine.app/b/MI-SLUG/
+
+# =============================================
+# SI MOD_PROXY NO ESTÁ DISPONIBLE:
+#
+# Usar generate_static.py en su lugar:
+#
+#   python generate_static.py \
+#     --slug mi-empresa \
+#     --domain www.cliente.com \
+#     --output ./blog
+#
+# Y subir los archivos .html generados por FTP.
+# =============================================

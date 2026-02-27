@@ -1,0 +1,57 @@
+# Framework web
+fastapi>=0.115.6
+uvicorn[standard]>=0.34.0
+python-multipart>=0.0.19
+jinja2>=3.1.5
+aiofiles>=24.1.0
+
+# Base de datos
+sqlalchemy[asyncio]>=2.0.36
+alembic>=1.14.1
+asyncpg>=0.30.0          # PostgreSQL async (producción)
+aiosqlite>=0.20.0        # SQLite async (desarrollo)
+
+# Cola de tareas (opcional, no requerido para ETAPA 2)
+# celery[redis]==5.4.0
+# redis==5.2.1
+
+# HTTP / APIs
+httpx>=0.28.1
+
+# IA - Proveedores
+anthropic>=0.42.0         # Claude API
+openai>=1.58.1            # DeepSeek (compatible con OpenAI)
+
+# Procesamiento de imágenes (opcional)
+# Pillow==11.1.0
+
+# PDFs y reportes (opcional)
+# reportlab==4.2.5
+
+# Seguridad
+cryptography>=44.0.0      # Fernet para encriptar credenciales
+python-jose[cryptography]>=3.3.0  # JWT tokens
+passlib[bcrypt]>=1.7.4    # Hashing de passwords
+python-dotenv>=1.0.1
+
+# Utilidades
+pyyaml>=6.0.2
+pydantic>=2.11.0          # >=2.11 tiene wheels para Python 3.14
+pydantic-settings>=2.8.0  # compatible con pydantic>=2.11
+rich>=13.9.4              # Output bonito en terminal
+click>=8.1.8              # CLI
+tenacity>=9.0.0           # Reintentos con backoff
+
+# SEO
+beautifulsoup4>=4.12.3
+lxml>=5.3.0
+
+# Pagos (opcional)
+# stripe==11.4.1
+
+# Testing
+pytest>=8.3.4
+pytest-asyncio>=0.25.0
+
+celery[redis]==5.4.0
+redis==5.2.1

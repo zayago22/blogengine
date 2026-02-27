@@ -1,0 +1,8 @@
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+  {% if post.estado == 'publicado' %}bg-green-100 text-green-700
+  {% elif post.estado == 'aprobado' %}bg-blue-100 text-blue-700
+  {% elif post.estado == 'en_revision' %}bg-yellow-100 text-yellow-700
+  {% elif post.estado == 'rechazado' %}bg-red-100 text-red-700
+  {% else %}bg-gray-100 text-gray-600{% endif %}">
+    {{ post.estado.replace('_', ' ').title() if post.estado else 'Borrador' }}
+</span>

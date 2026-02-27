@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard · BlogEngine{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <p class="text-sm text-gray-500">Clientes activos</p>
+        <p class="text-3xl font-bold text-gray-900 mt-1">{{ total_clients }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <p class="text-sm text-gray-500">Posts publicados</p>
+        <p class="text-3xl font-bold text-green-600 mt-1">{{ published_posts }}</p>
+        <p class="text-xs text-gray-400 mt-1">de {{ total_posts }} totales</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <p class="text-sm text-gray-500">Score SEO promedio</p>
+        <p
+            class="text-3xl font-bold mt-1
+      {% if avg_score >= 70 %}text-green-600{% elif avg_score >= 50 %}text-yellow-500{% else %}text-red-500{% endif %}">
+            {{ avg_score }}<span class="text-lg text-gray-400">/100</span>
+        </p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <p class="text-sm text-gray-500">Costo IA total</p>
+        <p class="text-3xl font-bold text-indigo-600 mt-1">${{ "%.4f"|format(costo_total) }}</p>
+        <p class="text-xs text-gray-400 mt-1">USD acumulado</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Posts en revisión -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-800">Posts en revisión
+                {% if pending_posts > 0 %}
+                <span class="ml-2 bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-0.5 rounded-full">{{
+                    pending_posts }}</span>
+                {% endif %}
+            </h2>
+            <a href="/admin/posts/?estado=en_revision" class="text-sm text-indigo-600 hover:underline">Ver todos</a>
+        </div>
+        <div class="divide-y divide-gray-50">
+            {% for post in posts_revision %}
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex-1 min-w-0">
+                    <a href="/admin/posts/{{ post.id }}/"
+                        class="text-sm font-medium text-gray-900 hover:text-indigo-600 truncate block">
+                        {{ post.titulo or post.keyword_principal or "Sin título" }}
+                    </a>
+                    <p class="text-xs text-gray-400 mt-0.5">Cliente #{{ post.client_id }}</p>
+                </div>
+                <div class="ml-4 flex items-center gap-2" id="post-badge-{{ post.id }}">
+                    <button hx-post="/admin/posts/{{ post.id }}/approve" hx-target="#post-badge-{{ post.id }}"
+                        hx-swap="innerHTML"
+                        class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">
+                        Aprobar
+                    </button>
+                    <button hx-post="/admin/posts/{{ post.id }}/publish" hx-target="#post-badge-{{ post.id }}"
+                        hx-swap="innerHTML"
+                        class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200">
+                        Publicar
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <div class="px-6 py-8 text-center text-gray-400 text-sm">No hay posts pendientes de revisión ✓</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Clientes recientes -->
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-800">Clientes</h2>
+            <a href="/admin/clients/" class="text-sm text-indigo-600 hover:underline">Ver todos</a>
+        </div>
+        <div class="divide-y divide-gray-50">
+            {% for client in clients %}
+            <a href="/admin/clients/{{ client.id }}/" class="flex items-center px-6 py-3 hover:bg-gray-50">
+                <div
+                    class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold mr-3">
+                    {{ client.nombre[0].upper() }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ client.nombre }}</p>
+                    <p class="text-xs text-gray-400">{{ client.industria or "—" }}</p>
+                </div>
+            </a>
+            {% else %}
+            <div class="px-6 py-8 text-center text-gray-400 text-sm">Sin clientes aún</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

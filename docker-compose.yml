@@ -51,6 +51,8 @@ services:
     build: .
     container_name: blogengine-celery-beat
     command: celery -A core.celery_app beat --loglevel=info --scheduler celery.beat:PersistentScheduler --schedule=/tmp/celerybeat-schedule
+    volumes:
+      - .:/app
     env_file:
       - .env
     depends_on:

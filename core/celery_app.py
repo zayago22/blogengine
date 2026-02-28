@@ -25,7 +25,7 @@ celery_app.conf.update(
 )
 
 # --- Auto-discover de tareas ---
-celery_app.autodiscover_tasks(["core.tasks", "core.scheduler", "core"])
+celery_app.autodiscover_tasks(["core.tasks", "core.task_wrappers", "core.scheduler"])
 
 # --- Beat schedule (tareas periódicas) ---
 celery_app.conf.beat_schedule = {

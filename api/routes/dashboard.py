@@ -18,7 +18,7 @@ from models.social_post import SocialPost
 from models.calendar import CalendarEntry
 from api.auth import require_auth, create_session_token, verify_session_token
 from config import get_settings
-from core.tasks import task_research_keywords
+from core.task_wrappers import task_research_keywords
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

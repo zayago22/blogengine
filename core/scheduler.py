@@ -21,7 +21,7 @@ logger = logging.getLogger("blogengine.scheduler")
 
 async def _dispatch_pipelines_async():
     """Obtiene todos los clientes activos y dispara su pipeline diario."""
-    from core.tasks import task_daily_pipeline
+    from core.task_wrappers import task_daily_pipeline
 
     async with async_session() as session:
         result = await session.execute(select(Client))

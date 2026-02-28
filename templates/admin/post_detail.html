@@ -55,8 +55,11 @@
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h2 class="font-semibold text-gray-800 mb-4">Score SEO</h2>
             <p class="text-gray-400 text-sm text-center">Sin auditoría guardada</p>
-            <a href="/api/seo/{{ client.id }}/audit/{{ post.id }}" target="_blank"
-                class="block mt-3 text-center text-xs text-indigo-500 hover:underline">Generar auditoría →</a>
+            <div id="audit-result"></div>
+            <button hx-post="/api/seo/{{ client.id }}/audit/{{ post.id }}" hx-target="#audit-result" hx-swap="innerHTML"
+                class="block mt-3 w-full text-center text-xs text-indigo-500 hover:underline cursor-pointer border border-indigo-300 rounded-lg py-2">
+                Generar auditoría →
+            </button>
         </div>
 
         <!-- Acciones -->

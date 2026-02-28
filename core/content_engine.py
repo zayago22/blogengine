@@ -697,6 +697,12 @@ class ContentEngine:
             elif ls.startswith("EXTRACTO:"):
                 extracto = ls.replace("EXTRACTO:", "").strip()
 
+        # Limpiar backticks markdown del HTML (```html ... ```)
+        contenido_html = re.sub(r'^\s*```html\s*\n?', '', contenido_html)
+        contenido_html = re.sub(r'^\s*```\w*\s*\n?', '', contenido_html)
+        contenido_html = re.sub(r'\n?\s*```\s*$', '', contenido_html)
+        contenido_html = contenido_html.strip()
+
         # Limpiar metadata del HTML
         for prefix in ["META_TITLE:", "META_DESCRIPTION:", "SLUG:", "EXTRACTO:"]:
             for linea in lineas:

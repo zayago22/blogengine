@@ -6,9 +6,19 @@
 <div class="bg-white rounded-xl shadow-sm">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <h2 class="font-semibold text-gray-800">Todos los clientes</h2>
-        <input type="search" name="q" value="{{ q }}" placeholder="Buscar cliente..." hx-get="/admin/clients/"
-            hx-target="#clients-table" hx-trigger="keyup changed delay:300ms" hx-include="this"
-            class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        <div class="flex items-center gap-3">
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar cliente..." hx-get="/admin/clients/"
+                hx-target="#clients-table" hx-trigger="keyup changed delay:300ms" hx-include="this"
+                class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+            <a href="/admin/clients/new"
+                class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Nuevo Cliente
+            </a>
+        </div>
     </div>
     <div id="clients-table">
         {% include "admin/partials/clients_table.html" %}

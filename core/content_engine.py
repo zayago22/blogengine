@@ -398,6 +398,7 @@ class ContentEngine:
                 contenido_html=contenido_html,
                 keyword_principal=keyword,
                 keywords_secundarias=keywords_sec,
+                existing_posts_count=len(existing_posts),
             )
 
             seo_score = audit["puntuacion"]
@@ -454,6 +455,7 @@ class ContentEngine:
             contenido_html=contenido_html,
             keyword_principal=keyword,
             keywords_secundarias=keywords_sec,
+            existing_posts_count=len(existing_posts),
         )
         seo_score = final_audit["puntuacion"]
         seo_passed = seo_score >= MIN_SEO_SCORE

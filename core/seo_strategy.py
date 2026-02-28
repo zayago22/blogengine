@@ -131,6 +131,7 @@ class OnPageSEOOptimizer:
         contenido_html: str,
         keyword_principal: str,
         keywords_secundarias: list[str] = None,
+        existing_posts_count: int = None,
     ) -> dict:
         """
         Audita el SEO on-page de un artículo.
@@ -259,16 +260,28 @@ class OnPageSEOOptimizer:
         internal_count = len(internal_links)
         external_count = len(external_links)
         
+        # Si es el primer artículo del cliente, no penalizar por internal links
+        # (no hay otros posts a los que enlazar todavía)
+        primer_articulo = existing_posts_count is not None and existing_posts_count <= 1
+
         if internal_count >= 2:
             checks.append({"check": f"Internal links ({internal_count})", "passed": True})
             puntos += 10
         elif internal_count == 1:
-            checks.append({"check": f"Internal links ({internal_count})", "passed": False, "detalle": "Mínimo 2"})
-            puntos += 5
-            sugerencias.append("Agregar al menos 1 internal link más a otros artículos del blog.")
+            if primer_articulo:
+                checks.append({"check": f"Internal links ({internal_count})", "passed": True, "detalle": "Primer artículo — sin penalización"})
+                puntos += 10
+            else:
+                checks.append({"check": f"Internal links ({internal_count})", "passed": False, "detalle": "Mínimo 2"})
+                puntos += 5
+                sugerencias.append("Agregar al menos 1 internal link más a otros artículos del blog.")
         else:
-            checks.append({"check": "Internal links (0)", "passed": False})
-            problemas.append("❌ Sin internal links. Agregar mínimo 2 links a otros artículos del blog.")
+            if primer_articulo:
+                checks.append({"check": "Internal links (0)", "passed": True, "detalle": "Primer artículo — sin penalización"})
+                puntos += 10
+            else:
+                checks.append({"check": "Internal links (0)", "passed": False})
+                problemas.append("❌ Sin internal links. Agregar mínimo 2 links a otros artículos del blog.")
         
         # --- 8. LONGITUD (10 puntos) ---
         if word_count >= 800:

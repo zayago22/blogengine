@@ -2,8 +2,8 @@
 Dashboard Admin — rutas SSR con Jinja2 + HTMX.
 """
 import logging
-from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
@@ -90,6 +90,59 @@ async def clients_list(request: Request, q: str = "", db: AsyncSession = Depends
         "q": q,
         "active_page": "clients",
     })
+
+
+@router.get("/clients/new", response_class=HTMLResponse)
+async def client_new(request: Request):
+    """Formulario para crear un nuevo cliente."""
+    return templates.TemplateResponse("admin/client_form.html", {
+        "request": request,
+        "active_page": "clients",
+    })
+
+
+@router.post("/clients/create")
+async def client_create(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    nombre: str = Form(...),
+    email: str = Form(""),
+    industria: str = Form(...),
+    sitio_web: str = Form(...),
+    blog_slug: str = Form(...),
+    blog_domain: str = Form(""),
+    tono_de_marca: str = Form("profesional"),
+    idioma: str = Form("es"),
+    audiencia_objetivo: str = Form(""),
+    descripcion_negocio: str = Form(""),
+    palabras_clave_nicho: str = Form(""),
+    plan: str = Form("free"),
+    frecuencia_publicacion: str = Form("semanal"),
+):
+    """Procesa la creación de un nuevo cliente desde el formulario."""
+    # Convertir palabras_clave_nicho de string CSV a lista
+    kw_list = [k.strip() for k in palabras_clave_nicho.split(",") if k.strip()]
+
+    client = Client(
+        nombre=nombre,
+        email=email or f"sin-email-{blog_slug}@blogengine.local",
+        industria=industria,
+        sitio_web=sitio_web,
+        blog_slug=blog_slug,
+        blog_domain=blog_domain or None,
+        tono_de_marca=tono_de_marca,
+        idioma=idioma,
+        audiencia_objetivo=audiencia_objetivo,
+        descripcion_negocio=descripcion_negocio,
+        palabras_clave_nicho=kw_list if kw_list else None,
+        plan=plan,
+        frecuencia_publicacion=frecuencia_publicacion,
+    )
+    db.add(client)
+    await db.commit()
+    await db.refresh(client)
+    logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id})")
+    return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
 
 
 @router.get("/clients/{client_id}/", response_class=HTMLResponse)

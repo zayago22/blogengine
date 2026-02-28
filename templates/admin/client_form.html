@@ -1,0 +1,168 @@
+{% extends "admin/base.html" %}
+{% block title %}Nuevo Cliente · BlogEngine{% endblock %}
+{% block heading %}Nuevo Cliente{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <a href="/admin/clients/"
+        class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Volver a clientes
+    </a>
+
+    <form method="POST" action="/admin/clients/create" class="space-y-6">
+
+        <!-- Info básica -->
+        <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+            <h2 class="font-semibold text-gray-800 text-base border-b border-gray-100 pb-3">Información básica</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="nombre" required placeholder="Ej. Taco Madre"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" placeholder="hola@empresa.com"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Industria <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="industria" required placeholder="Ej. restaurantes, inmobiliario, salud"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sitio web <span
+                            class="text-red-500">*</span></label>
+                    <input type="url" name="sitio_web" required placeholder="https://empresa.com"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog -->
+        <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+            <h2 class="font-semibold text-gray-800 text-base border-b border-gray-100 pb-3">Blog</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Blog slug <span class="text-red-500">*</span>
+                        <span class="text-xs text-gray-400 font-normal ml-1">(solo letras, números y guiones)</span>
+                    </label>
+                    <input type="text" name="blog_slug" required pattern="[a-z0-9-]+" placeholder="taco-madre"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Blog domain
+                        <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span>
+                    </label>
+                    <input type="text" name="blog_domain" placeholder="blog.empresa.com"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+            </div>
+        </div>
+
+        <!-- SEO & Contenido -->
+        <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+            <h2 class="font-semibold text-gray-800 text-base border-b border-gray-100 pb-3">SEO & Contenido</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tono de marca</label>
+                    <select name="tono_de_marca"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <option value="profesional">Profesional</option>
+                        <option value="casual">Casual</option>
+                        <option value="tecnico">Técnico</option>
+                        <option value="amigable">Amigable</option>
+                        <option value="corporativo">Corporativo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Idioma</label>
+                    <select name="idioma"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                        <option value="pt">Português</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Audiencia objetivo</label>
+                    <input type="text" name="audiencia_objetivo" placeholder="Ej. dueños de restaurantes en México"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del negocio</label>
+                    <textarea name="descripcion_negocio" rows="3"
+                        placeholder="Describe brevemente el negocio, qué vende y a quién..."
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Palabras clave del nicho
+                        <span class="text-xs text-gray-400 font-normal ml-1">(separadas por coma)</span>
+                    </label>
+                    <input type="text" name="palabras_clave_nicho"
+                        placeholder="tacos, comida mexicana, restaurante cdmx"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan -->
+        <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+            <h2 class="font-semibold text-gray-800 text-base border-b border-gray-100 pb-3">Plan</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                    <select name="plan"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <option value="free">Free</option>
+                        <option value="starter">Starter</option>
+                        <option value="pro">Pro</option>
+                        <option value="agency">Agency</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia de publicación</label>
+                    <select name="frecuencia_publicacion"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <option value="diaria">Diaria</option>
+                        <option value="semanal">Semanal</option>
+                        <option value="quincenal">Quincenal</option>
+                        <option value="mensual">Mensual</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center justify-end gap-3 pb-6">
+            <a href="/admin/clients/"
+                class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                Cancelar
+            </a>
+            <button type="submit"
+                class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Crear Cliente
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

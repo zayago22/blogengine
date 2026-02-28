@@ -25,7 +25,7 @@ celery_app.conf.update(
 )
 
 # --- Auto-discover de tareas ---
-celery_app.autodiscover_tasks(["core.tasks"])
+celery_app.autodiscover_tasks(["core.tasks", "core.scheduler", "core"])
 
 # --- Beat schedule (tareas periódicas) ---
 celery_app.conf.beat_schedule = {
@@ -53,6 +53,11 @@ celery_app.conf.beat_schedule = {
     "generate-monthly-calendars": {
         "task": "core.tasks.calendar_gen.generate_calendars",
         "schedule": crontab(hour=7, minute=0, day_of_month=1),
+    },
+    # Dispatcher: lanza pipeline diario para TODOS los clientes a las 8:00 AM
+    "dispatch-daily-pipelines": {
+        "task": "core.scheduler.dispatch_daily_pipelines",
+        "schedule": crontab(hour=8, minute=0),
     },
 }
 

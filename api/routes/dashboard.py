@@ -18,6 +18,7 @@ from models.social_post import SocialPost
 from models.calendar import CalendarEntry
 from api.auth import require_auth, create_session_token, verify_session_token
 from config import get_settings
+from core.tasks import task_research_keywords
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -213,6 +214,14 @@ async def client_create(request: Request, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(client)
     logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id}) slug={blog_slug}")
+
+    # Auto-disparar keyword research para el nuevo cliente (si Redis/Celery está activo)
+    try:
+        task_research_keywords.delay(client.id)
+        logger.info(f"[Dashboard] task_research_keywords encolada para cliente {client.id}")
+    except Exception as celery_err:
+        logger.warning(f"[Dashboard] Celery no disponible, research no encolado: {celery_err}")
+
     return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
 
 

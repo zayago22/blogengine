@@ -10,4 +10,5 @@ COPY --from=builder /install /usr/local
 COPY . .
 RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
+ENV PYTHONPATH=/app
 CMD ["celery", "-A", "core.celery_app", "worker", "--loglevel=info", "--concurrency=2"]

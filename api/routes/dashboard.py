@@ -5,7 +5,7 @@ import logging
 import re
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc, delete
@@ -16,13 +16,67 @@ from models.seo_strategy import MoneyPage, SEOKeyword, TopicCluster, SEOAuditLog
 from models.ai_usage import AIUsage
 from models.social_post import SocialPost
 from models.calendar import CalendarEntry
+from api.auth import require_auth, create_session_token, verify_session_token
+from config import get_settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+# ============================================================
+# AUTH: Login / Logout (sin require_auth)
+# ============================================================
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """Formulario de login."""
+    return templates.TemplateResponse("admin/login.html", {
+        "request": request,
+        "error": None,
+    })
+
+
+@router.post("/login")
+async def login_submit(request: Request):
+    """Procesa el login. Si OK → cookie + redirect /admin/."""
+    form = await request.form()
+    username = form.get("username", "").strip()
+    password = form.get("password", "").strip()
+
+    s = get_settings()
+    if username == s.admin_user and password == s.admin_password:
+        token = create_session_token()
+        response = RedirectResponse(url="/admin/", status_code=303)
+        response.set_cookie(
+            key="session_token",
+            value=token,
+            httponly=True,
+            samesite="lax",
+            max_age=60 * 60 * 24 * 7,  # 7 días
+        )
+        logger.info(f"[Auth] Login exitoso: {username}")
+        return response
+
+    logger.warning(f"[Auth] Login fallido: {username}")
+    return templates.TemplateResponse("admin/login.html", {
+        "request": request,
+        "error": "Credenciales incorrectas",
+    }, status_code=401)
+
+
+@router.get("/logout")
+async def logout():
+    """Cierra sesión borrando la cookie."""
+    response = RedirectResponse(url="/admin/login", status_code=303)
+    response.delete_cookie("session_token")
+    return response
+
+
+# ============================================================
+# DASHBOARD (rutas protegidas)
+# ============================================================
+
+@router.get("/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def dashboard_home(request: Request, db: AsyncSession = Depends(get_db)):
     """Dashboard principal con stats."""
     # Stats generales
@@ -73,7 +127,7 @@ async def dashboard_home(request: Request, db: AsyncSession = Depends(get_db)):
     })
 
 
-@router.get("/clients/", response_class=HTMLResponse)
+@router.get("/clients/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def clients_list(request: Request, q: str = "", db: AsyncSession = Depends(get_db)):
     """Lista de clientes."""
     query = select(Client).order_by(desc(Client.id))
@@ -96,7 +150,7 @@ async def clients_list(request: Request, q: str = "", db: AsyncSession = Depends
     })
 
 
-@router.get("/clients/new", response_class=HTMLResponse)
+@router.get("/clients/new", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def client_new(request: Request):
     """Formulario para crear un nuevo cliente."""
     return templates.TemplateResponse("admin/client_form.html", {
@@ -105,7 +159,7 @@ async def client_new(request: Request):
     })
 
 
-@router.post("/clients/create")
+@router.post("/clients/create", dependencies=[Depends(require_auth)])
 async def client_create(request: Request, db: AsyncSession = Depends(get_db)):
     """Procesa la creación de un nuevo cliente desde el formulario."""
     form = await request.form()
@@ -162,7 +216,7 @@ async def client_create(request: Request, db: AsyncSession = Depends(get_db)):
     return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
 
 
-@router.get("/clients/{client_id}/", response_class=HTMLResponse)
+@router.get("/clients/{client_id}/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def client_detail(request: Request, client_id: int, db: AsyncSession = Depends(get_db)):
     """Detalle de cliente con tabs."""
     client = await db.get(Client, client_id)
@@ -203,7 +257,7 @@ async def client_detail(request: Request, client_id: int, db: AsyncSession = Dep
     })
 
 
-@router.delete("/clients/{client_id}/delete")
+@router.delete("/clients/{client_id}/delete", dependencies=[Depends(require_auth)])
 async def client_delete(client_id: int, db: AsyncSession = Depends(get_db)):
     """Elimina un cliente y todos sus datos relacionados."""
     client = await db.get(Client, client_id)
@@ -227,7 +281,7 @@ async def client_delete(client_id: int, db: AsyncSession = Depends(get_db)):
     return HTMLResponse(content="")
 
 
-@router.get("/posts/", response_class=HTMLResponse)
+@router.get("/posts/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def posts_list(request: Request, estado: str = "", client_id: int = 0, db: AsyncSession = Depends(get_db)):
     """Lista de posts con filtros."""
     query = select(BlogPost).order_by(desc(BlogPost.created_at)).limit(50)
@@ -255,7 +309,7 @@ async def posts_list(request: Request, estado: str = "", client_id: int = 0, db:
     })
 
 
-@router.get("/posts/{post_id}/", response_class=HTMLResponse)
+@router.get("/posts/{post_id}/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def post_detail(request: Request, post_id: int, db: AsyncSession = Depends(get_db)):
     """Detalle del post con audit SEO."""
     post = await db.get(BlogPost, post_id)
@@ -272,7 +326,7 @@ async def post_detail(request: Request, post_id: int, db: AsyncSession = Depends
     })
 
 
-@router.post("/posts/{post_id}/approve", response_class=HTMLResponse)
+@router.post("/posts/{post_id}/approve", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def approve_post(request: Request, post_id: int, db: AsyncSession = Depends(get_db)):
     """Aprueba un post (HTMX action)."""
     post = await db.get(BlogPost, post_id)
@@ -287,7 +341,7 @@ async def approve_post(request: Request, post_id: int, db: AsyncSession = Depend
     })
 
 
-@router.post("/posts/{post_id}/publish", response_class=HTMLResponse)
+@router.post("/posts/{post_id}/publish", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def publish_post_admin(request: Request, post_id: int, db: AsyncSession = Depends(get_db)):
     """Publica un post (HTMX action)."""
     from datetime import datetime, timezone

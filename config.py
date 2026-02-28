@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     blogengine_base_url: str = "http://localhost:8000"
     admin_key: str = "blogengine-admin-secret-change-me"
 
+    # Dashboard admin auth
+    admin_user: str = "admin"
+    admin_password: str = "admin"
+
     # DeepSeek
     deepseek_api_key: str = ""
     deepseek_base_url: str = "https://api.deepseek.com"

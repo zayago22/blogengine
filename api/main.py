@@ -6,9 +6,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
 
 from models.base import init_db
 from utils.logger import setup_logging
+from api.auth import RequiresLoginException
 from api.routes import clients, posts, publish, calendar, analytics, webhooks, seo, integrations
 from api.routes.test_ai import router as test_ai_router
 from api.routes.dashboard import router as dashboard_router
@@ -54,6 +57,12 @@ templates = Jinja2Templates(directory="templates")
 
 # --- Rutas API ---
 app.include_router(clients.router, prefix="/api/clients", tags=["Clientes"])
+
+
+@app.exception_handler(RequiresLoginException)
+async def requires_login_handler(request: Request, exc: RequiresLoginException):
+    """Redirige al login cuando una ruta protegida detecta sesión inválida."""
+    return RedirectResponse(url="/admin/login", status_code=303)
 app.include_router(posts.router, prefix="/api/posts", tags=["Blog Posts"])
 app.include_router(publish.router, prefix="/api/publish", tags=["Publicación"])
 app.include_router(calendar.router, prefix="/api/calendar", tags=["Calendario"])

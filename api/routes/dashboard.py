@@ -8,12 +8,14 @@ from fastapi.responses import HTMLResponse
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, delete
 from models.base import get_db
 from models.client import Client
 from models.blog_post import BlogPost
-from models.seo_strategy import MoneyPage, SEOKeyword, TopicCluster
+from models.seo_strategy import MoneyPage, SEOKeyword, TopicCluster, SEOAuditLog
 from models.ai_usage import AIUsage
+from models.social_post import SocialPost
+from models.calendar import CalendarEntry
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -199,6 +201,30 @@ async def client_detail(request: Request, client_id: int, db: AsyncSession = Dep
         "clusters": clusters,
         "active_page": "clients",
     })
+
+
+@router.delete("/clients/{client_id}/delete")
+async def client_delete(client_id: int, db: AsyncSession = Depends(get_db)):
+    """Elimina un cliente y todos sus datos relacionados."""
+    client = await db.get(Client, client_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+    # Borrar en orden para respetar FKs sin CASCADE configurado
+    await db.execute(delete(SEOAuditLog).where(SEOAuditLog.client_id == client_id))
+    await db.execute(delete(SocialPost).where(SocialPost.client_id == client_id))
+    await db.execute(delete(CalendarEntry).where(CalendarEntry.client_id == client_id))
+    await db.execute(delete(AIUsage).where(AIUsage.client_id == client_id))
+    await db.execute(delete(SEOKeyword).where(SEOKeyword.client_id == client_id))
+    await db.execute(delete(TopicCluster).where(TopicCluster.client_id == client_id))
+    await db.execute(delete(MoneyPage).where(MoneyPage.client_id == client_id))
+    await db.execute(delete(BlogPost).where(BlogPost.client_id == client_id))
+    await db.delete(client)
+    await db.commit()
+
+    logger.info(f"[Dashboard] Cliente eliminado: {client.nombre} (id={client_id})")
+    # Devolver string vacío → HTMX remueve la fila con outerHTML swap
+    return HTMLResponse(content="")
 
 
 @router.get("/posts/", response_class=HTMLResponse)

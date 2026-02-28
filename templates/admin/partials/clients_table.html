@@ -20,7 +20,12 @@
             <td class="px-6 py-3 text-gray-600">{{ client.dominio or "—" }}</td>
             <td class="px-6 py-3">
                 <a href="/admin/clients/{{ client.id }}/" class="text-indigo-600 hover:underline text-xs">Ver detalle
-                    →</a>
+                    &rarr;</a>
+                <button hx-delete="/admin/clients/{{ client.id }}/delete"
+                    hx-confirm="¿Estás seguro de eliminar a {{ client.nombre }}? Se borrarán todos sus posts, keywords y money pages."
+                    hx-target="closest tr" hx-swap="outerHTML" class="ml-3 text-red-500 hover:text-red-700 text-xs">
+                    Eliminar
+                </button>
             </td>
         </tr>
         {% else %}

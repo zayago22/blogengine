@@ -2,8 +2,10 @@
 Dashboard Admin — rutas SSR con Jinja2 + HTMX.
 """
 import logging
-from fastapi import APIRouter, Request, Depends, HTTPException, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+import re
+from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi.responses import HTMLResponse
+from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
@@ -102,24 +104,37 @@ async def client_new(request: Request):
 
 
 @router.post("/clients/create")
-async def client_create(
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-    nombre: str = Form(...),
-    email: str = Form(""),
-    industria: str = Form(...),
-    sitio_web: str = Form(...),
-    blog_slug: str = Form(...),
-    blog_domain: str = Form(""),
-    tono_de_marca: str = Form("profesional"),
-    idioma: str = Form("es"),
-    audiencia_objetivo: str = Form(""),
-    descripcion_negocio: str = Form(""),
-    palabras_clave_nicho: str = Form(""),
-    plan: str = Form("free"),
-    frecuencia_publicacion: str = Form("semanal"),
-):
+async def client_create(request: Request, db: AsyncSession = Depends(get_db)):
     """Procesa la creación de un nuevo cliente desde el formulario."""
+    form = await request.form()
+
+    nombre = form.get("nombre", "").strip()
+    email = form.get("email", "").strip()
+    industria = form.get("industria", "").strip()
+    sitio_web = form.get("sitio_web", "").strip()
+    blog_domain = form.get("blog_domain", "").strip()
+    tono_de_marca = form.get("tono_de_marca", "profesional")
+    idioma = form.get("idioma", "es")
+    audiencia_objetivo = form.get("audiencia_objetivo", "").strip()
+    descripcion_negocio = form.get("descripcion_negocio", "").strip()
+    palabras_clave_nicho = form.get("palabras_clave_nicho", "")
+    plan = form.get("plan", "free")
+    frecuencia_publicacion = form.get("frecuencia_publicacion", "semanal")
+
+    # Auto-generar slug del nombre si viene vacío
+    blog_slug = form.get("blog_slug", "").strip()
+    if not blog_slug:
+        blog_slug = nombre.lower().strip()
+        blog_slug = re.sub(r'[áàäâ]', 'a', blog_slug)
+        blog_slug = re.sub(r'[éèëê]', 'e', blog_slug)
+        blog_slug = re.sub(r'[íìïî]', 'i', blog_slug)
+        blog_slug = re.sub(r'[óòöô]', 'o', blog_slug)
+        blog_slug = re.sub(r'[úùüû]', 'u', blog_slug)
+        blog_slug = re.sub(r'[ñ]', 'n', blog_slug)
+        blog_slug = re.sub(r'[^a-z0-9\s-]', '', blog_slug)
+        blog_slug = re.sub(r'[\s]+', '-', blog_slug)
+        blog_slug = re.sub(r'-+', '-', blog_slug).strip('-')
+
     # Convertir palabras_clave_nicho de string CSV a lista
     kw_list = [k.strip() for k in palabras_clave_nicho.split(",") if k.strip()]
 
@@ -141,7 +156,7 @@ async def client_create(
     db.add(client)
     await db.commit()
     await db.refresh(client)
-    logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id})")
+    logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id}) slug={blog_slug}")
     return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
 
 

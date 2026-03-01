@@ -163,74 +163,84 @@ async def client_new(request: Request):
 @router.post("/clients/create", dependencies=[Depends(require_auth)])
 async def client_create(request: Request, db: AsyncSession = Depends(get_db)):
     """Procesa la creación de un nuevo cliente desde el formulario."""
-    form = await request.form()
-
-    nombre = form.get("nombre", "").strip()
-    email = form.get("email", "").strip()
-    industria = form.get("industria", "").strip()
-    sitio_web = form.get("sitio_web", "").strip()
-    blog_domain = form.get("blog_domain", "").strip()
-    tono_de_marca = form.get("tono_de_marca", "profesional")
-    idioma = form.get("idioma", "es")
-    audiencia_objetivo = form.get("audiencia_objetivo", "").strip()
-    descripcion_negocio = form.get("descripcion_negocio", "").strip()
-    palabras_clave_nicho = form.get("palabras_clave_nicho", "")
-    plan = form.get("plan", "free")
-    frecuencia_publicacion = form.get("frecuencia_publicacion", "semanal")
-
-    # Auto-generar slug del nombre si viene vacío
-    blog_slug = form.get("blog_slug", "").strip()
-    if not blog_slug:
-        blog_slug = nombre.lower().strip()
-        blog_slug = re.sub(r'[áàäâ]', 'a', blog_slug)
-        blog_slug = re.sub(r'[éèëê]', 'e', blog_slug)
-        blog_slug = re.sub(r'[íìïî]', 'i', blog_slug)
-        blog_slug = re.sub(r'[óòöô]', 'o', blog_slug)
-        blog_slug = re.sub(r'[úùüû]', 'u', blog_slug)
-        blog_slug = re.sub(r'[ñ]', 'n', blog_slug)
-        blog_slug = re.sub(r'[^a-z0-9\s-]', '', blog_slug)
-        blog_slug = re.sub(r'[\s]+', '-', blog_slug)
-        blog_slug = re.sub(r'-+', '-', blog_slug).strip('-')
-
-    # Convertir palabras_clave_nicho de string CSV a lista
-    kw_list = [k.strip() for k in palabras_clave_nicho.split(",") if k.strip()]
-
-    client = Client(
-        nombre=nombre,
-        email=email or f"sin-email-{blog_slug}@blogengine.local",
-        industria=industria,
-        sitio_web=sitio_web,
-        blog_slug=blog_slug,
-        blog_domain=blog_domain or None,
-        tono_de_marca=tono_de_marca,
-        idioma=idioma,
-        audiencia_objetivo=audiencia_objetivo,
-        descripcion_negocio=descripcion_negocio,
-        palabras_clave_nicho=kw_list if kw_list else None,
-        plan=plan,
-        frecuencia_publicacion=frecuencia_publicacion,
-    )
-    db.add(client)
-    await db.commit()
-    await db.refresh(client)
-    logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id}) slug={blog_slug}")
-
-    # Auto-disparar keyword research para el nuevo cliente (si Redis/Celery está activo)
-    async def _enqueue_research():
-        try:
-            import asyncio
-            await asyncio.wait_for(
-                asyncio.to_thread(task_research_keywords.delay, client.id),
-                timeout=3.0,
-            )
-            logger.info(f"[Dashboard] task_research_keywords encolada para cliente {client.id}")
-        except Exception as celery_err:
-            logger.warning(f"[Dashboard] Celery no disponible, research no encolado: {celery_err}")
-
     import asyncio
-    asyncio.create_task(_enqueue_research())
+    import traceback
 
-    return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
+    try:
+        form = await request.form()
+
+        nombre = form.get("nombre", "").strip()
+        email = form.get("email", "").strip()
+        industria = form.get("industria", "").strip()
+        sitio_web = form.get("sitio_web", "").strip()
+        blog_domain = form.get("blog_domain", "").strip()
+        tono_de_marca = form.get("tono_de_marca", "profesional")
+        idioma = form.get("idioma", "es")
+        audiencia_objetivo = form.get("audiencia_objetivo", "").strip()
+        descripcion_negocio = form.get("descripcion_negocio", "").strip()
+        palabras_clave_nicho = form.get("palabras_clave_nicho", "")
+        plan = form.get("plan", "free")
+        frecuencia_publicacion = form.get("frecuencia_publicacion", "semanal")
+
+        # Auto-generar slug del nombre si viene vacío
+        blog_slug = form.get("blog_slug", "").strip()
+        if not blog_slug:
+            blog_slug = nombre.lower().strip()
+            blog_slug = re.sub(r'[áàäâ]', 'a', blog_slug)
+            blog_slug = re.sub(r'[éèëê]', 'e', blog_slug)
+            blog_slug = re.sub(r'[íìïî]', 'i', blog_slug)
+            blog_slug = re.sub(r'[óòöô]', 'o', blog_slug)
+            blog_slug = re.sub(r'[úùüû]', 'u', blog_slug)
+            blog_slug = re.sub(r'[ñ]', 'n', blog_slug)
+            blog_slug = re.sub(r'[^a-z0-9\s-]', '', blog_slug)
+            blog_slug = re.sub(r'[\s]+', '-', blog_slug)
+            blog_slug = re.sub(r'-+', '-', blog_slug).strip('-')
+
+        # Convertir palabras_clave_nicho de string CSV a lista
+        kw_list = [k.strip() for k in palabras_clave_nicho.split(",") if k.strip()]
+
+        client = Client(
+            nombre=nombre,
+            email=email or f"sin-email-{blog_slug}@blogengine.local",
+            industria=industria,
+            sitio_web=sitio_web,
+            blog_slug=blog_slug,
+            blog_domain=blog_domain or None,
+            tono_de_marca=tono_de_marca,
+            idioma=idioma,
+            audiencia_objetivo=audiencia_objetivo,
+            descripcion_negocio=descripcion_negocio,
+            palabras_clave_nicho=kw_list if kw_list else None,
+            plan=plan,
+            frecuencia_publicacion=frecuencia_publicacion,
+        )
+        db.add(client)
+        await db.commit()
+        await db.refresh(client)
+        logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id}) slug={blog_slug}")
+
+        # Auto-disparar keyword research (fire-and-forget en thread separado)
+        def _fire_research(cid):
+            try:
+                task_research_keywords.delay(cid)
+                logger.info(f"[Dashboard] task_research_keywords encolada para cliente {cid}")
+            except Exception as err:
+                logger.warning(f"[Dashboard] Celery no disponible: {err}")
+
+        import threading
+        threading.Thread(target=_fire_research, args=[client.id], daemon=True).start()
+
+        return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
+
+    except Exception as e:
+        error_detail = traceback.format_exc()
+        logger.error(f"[Dashboard] Error creando cliente: {error_detail}")
+        await db.rollback()
+        return templates.TemplateResponse("admin/client_form.html", {
+            "request": request,
+            "active_page": "clients",
+            "error": f"Error al crear cliente: {str(e)}",
+        }, status_code=500)
 
 
 @router.get("/clients/{client_id}/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])

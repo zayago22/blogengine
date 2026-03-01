@@ -130,15 +130,15 @@ class ContentEngine:
             client_name=client.nombre,
             client_industry=client.industria,
             client_services=services,
-            client_location=client.descripcion or client.industria or "general",
+            client_location=client.descripcion_negocio or client.industria or "general",
             existing_keywords=existing,
             num_keywords=num_keywords,
         )
 
         # Refuerzo de ubicación/mercado si el cliente tiene descripción
-        if client.descripcion:
+        if client.descripcion_negocio:
             user += (
-                f"\n\nCONTEXTO IMPORTANTE DEL NEGOCIO:\n{client.descripcion}\n\n"
+                f"\n\nCONTEXTO IMPORTANTE DEL NEGOCIO:\n{client.descripcion_negocio}\n\n"
                 "Genera keywords relevantes para la ubicación y mercado descrito arriba. "
                 "NO generar keywords para otros países o regiones que no apliquen."
             )

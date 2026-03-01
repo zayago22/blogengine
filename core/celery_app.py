@@ -22,6 +22,10 @@ celery_app.conf.update(
     accept_content=["json"],
     task_track_started=True,
     task_acks_late=True,
+    broker_connection_timeout=5,
+    broker_connection_retry_on_startup=False,
+    redis_socket_connect_timeout=5,
+    redis_socket_timeout=5,
 )
 
 # --- Auto-discover de tareas ---

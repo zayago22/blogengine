@@ -216,11 +216,19 @@ async def client_create(request: Request, db: AsyncSession = Depends(get_db)):
     logger.info(f"[Dashboard] Cliente creado: {client.nombre} (id={client.id}) slug={blog_slug}")
 
     # Auto-disparar keyword research para el nuevo cliente (si Redis/Celery está activo)
-    try:
-        task_research_keywords.delay(client.id)
-        logger.info(f"[Dashboard] task_research_keywords encolada para cliente {client.id}")
-    except Exception as celery_err:
-        logger.warning(f"[Dashboard] Celery no disponible, research no encolado: {celery_err}")
+    async def _enqueue_research():
+        try:
+            import asyncio
+            await asyncio.wait_for(
+                asyncio.to_thread(task_research_keywords.delay, client.id),
+                timeout=3.0,
+            )
+            logger.info(f"[Dashboard] task_research_keywords encolada para cliente {client.id}")
+        except Exception as celery_err:
+            logger.warning(f"[Dashboard] Celery no disponible, research no encolado: {celery_err}")
+
+    import asyncio
+    asyncio.create_task(_enqueue_research())
 
     return RedirectResponse(f"/admin/clients/{client.id}/", status_code=303)
 
